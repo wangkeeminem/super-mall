@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div id="app">
+    <h2>{{message}}</h2> 
+    <h2>{{message}}</h2> 
+    <h2>{{message}}</h2> 
+    <h2>{{name}}</h2> 
+    <h2>{{name}}</h2> 
+  </div>
+  <script src="./node_modules/vue/dist/vue.js"></script>
+  <script>
+    const app=new Vue({
+      el: '#app',
+      data:{
+        message:"hahahahhahaha",
+        name:"王红元男神"  
+    }
+    })
+    
+    const obj={
+      message:"XXX",name:"nnn"
+    }
+    //调用、设置的监听实现
+    Object.keys(obj).forEach(key=>{
+      let value=obj[key] //取出key
+       Object.defineProperty(obj,key,{
+       set(newValue){
+         value=newValue
+         dep.notify()//发生赋值时，调用通知函数
+         console.log('调用了set')       
+        },
+       get(newValue){
+        console.log('调用了get')   
+         return value
+        },
+      })
+    })
+
+//依赖对象的对应实现
+    class Dep{//依赖
+      constructor(){
+        this.subs=[]//记录谁在订阅
+      }
+      addSub(watcher){
+        this.subs.push(watcher)
+      }
+      notify(){//遍历订阅者，进行更新
+        this.subs.forEach(item=>{
+          item.update()
+        })
+      }
+    }
+
+    class Watcher{//观察使用的类
+      constructor(name){
+        this.name=name//记录谁在订阅
+      }  
+        update(){//用于创建对象
+          console.log(this.name+"发生了update") 
+        }
+    }
+    const dep=new Dep()
+    const w1 = new Watcher('张三')//一旦在组件定义属性，就会执行，定义使用的一个类
+    dep.addSub(w1)//将次观察者注册到依赖记录里
+    const w2 = new Watcher('李四')//一旦在组件定义属性，就会执行，定义使用的一个类
+    dep.addSub(w2)//将次观察者注册到依赖记录里
+    const w3 = new Watcher('王五')//一旦在组件定义属性，就会执行，定义使用的一个类
+    dep.addSub(w3)//将次观察者注册到依赖记录里
+    dep.notify()
+
+  </script>
+</body>
+</html>
